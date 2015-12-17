@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+<context:component-scan base-package="first"/><!-- @Component 바코드를 스캔하기 위해서 사용됨 -->
+
+<bean id= "messageBean" class="first.MessageBeanImpl">
+	<property name="name" value="홍길동"></property>
+</bean>
+<!-- 
+<bean id="logginAdvice" class="first.LoggingAdvice"></bean> --><!-- Advice(여기서는 성능 측정해주는 코드) -->
+
+<bean id="advisor" class="org.springframework.aop.support.DefaultPointcutAdvisor"><!-- (Advice+PointCut) -->
+	<property name="advice" ref="loggingAdvice"></property>
+	<property name="pointcut">
+		<bean class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+			<property name="pattern" value=".*sayHello.*"></property><!-- sayHello 메서드를 찾아준다. -->
+		</bean>
+	</property>
+</bean>
+
+<bean id="proxy" class="org.springframework.aop.framework.ProxyFactoryBean"><!--행동대장역할, 즉 실행해주는 역할  -->
+	<property name="target" ref="messageBean"/>
+	<property name="interceptorNames">
+		<list>
+			<value>advisor</value>
+		</list>
+	</property>
+</bean>
+</beans>
